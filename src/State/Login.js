@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import clsx from "clsx";
+import './Login.scss'
 
 export default function Login() {
   //   const [email, setEmail] = useState('')
@@ -12,6 +13,12 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const InputRef = useRef();
+
+  const EyeRef = useRef()
 
   const isEmail = (email) => {
     const pattern = /^[a-z]+[a-z-_\.0-9]+@[a-z]+[a-z-_\.0-9]\.[a-z]{2,}$/;
@@ -42,8 +49,10 @@ export default function Login() {
 
     if (typeof password === "string" && password.trim() === "") {
       errors.password.required = "Mật khẩu không được để trống";
+      EyeRef.current.style.display = 'none'
     } else if (!isPasswordStrength(password)) {
       errors.password.strength = "Mật khẩu không đủ mạnh";
+      EyeRef.current.style.display = 'none'
     }
 
     setErrors(errors);
@@ -70,6 +79,17 @@ export default function Login() {
     setForm(data);
   };
 
+  const handleShowPassword = () => {
+
+    if (showPassword) {
+      setShowPassword(false)
+      InputRef.current.type = 'password'
+    } else {
+      setShowPassword(true)
+      InputRef.current.type = 'text'
+    }
+  }
+
   return (
     <div className="container py-5">
       <div className="row justify-content-center">
@@ -93,7 +113,7 @@ export default function Login() {
               )}
             </div>
 
-            <div className="mb-3">
+            <div className="mb-3 password" style={{position: 'relative'}}>
               <label htmlFor="password">Mật khẩu</label>
               <input
                 type="password"
@@ -102,7 +122,11 @@ export default function Login() {
                 id="password"
                 name="password"
                 onChange={handleChangeValue}
-              />
+                ref={InputRef}
+              ></input>
+              <span onClick={handleShowPassword} ref={EyeRef}>
+                {showPassword ? (<i className="fa-solid fa-eye"></i>): (<i className="fa-solid fa-eye-slash"></i>)}
+              </span>
               {getError(errors, "password") && (
                 <div className="invalid-feedback">
                   {getError(errors, "password")}
